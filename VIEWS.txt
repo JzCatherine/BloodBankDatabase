@@ -1,0 +1,160 @@
+=============================================================
+VIEWS:
+-inv_avail
+-inv_req
+-grpd_qty
+-dnr_status
+-dnr_emp
+-shelf_life
+=inv_avail======================================================
+VIEW: select bags that are still available for request
+
+COLUMN "Inventory ID" FORMAT A12
+COLUMN "Blood Type" FORMAT A10
+COLUMN "Request ID" FORMAT A10
+COLUMN "Date Requested" FORMAT A14
+
+CREATE VIEW inv_avail
+AS     SELECT inventory_id "Inventory ID",
+              blood_type "Blood Type",
+              blood_quantity "Quantity"
+       FROM   inventory
+       WHERE  request_id IS NULL
+       ORDER BY inventory_id;
+------------------------
+SELECT * FROM inv_avail;
+
+=inv_req==========================================================
+VIEW: select bags that are requested and show the hospital
+
+COLUMN "Inventory ID" FORMAT A12
+COLUMN "Blood Type" FORMAT A10
+COLUMN "Request ID" FORMAT A10
+COLUMN "Date Requested" FORMAT A14
+
+CREATE VIEW inv_req
+AS     SELECT i.inventory_id   "Inventory ID",
+              i.blood_type     "Blood Type",
+              i.blood_quantity "Quantity",
+              r.request_id     "Request ID",
+              r.request_date   "Date Requested",
+              h.hospital_name  "Hospital"
+       FROM   inventory i 
+       JOIN   request   r
+       ON     i.request_id = r.request_id
+       JOIN   hospital h
+       ON     r.hospital_id = h.hospital_id
+       WHERE  i.request_id IS NOT NULL
+       ORDER BY inventory_id;
+----------------------
+SELECT * FROM inv_req;
+
+=grpd_qty=======================================================
+VIEW: group donors, and the sum of their blood donation
+
+COLUMN "Blood Type" FORMAT A10
+
+CREATE VIEW grpd_qty
+AS     SELECT donor_id, last_name, blood_type, 
+              SUM(blood_quantity) total
+       FROM donor NATURAL JOIN donation_log
+       GROUP BY donor_id, last_name, blood_type
+       ORDER BY last_name;
+-----------------------
+SELECT * FROM grpd_qty;
+----------------------------------------------------------
+update:
+CREATE OR REPLACE VIEW grpd_qty
+     ("Donor ID", "Donor", "Blood Type", "Total Quantity")
+AS     SELECT donor_id,   last_name || ', ' || first_name, 
+              blood_type, SUM(blood_quantity)
+       FROM donor NATURAL JOIN donation_log
+       GROUP BY donor_id, last_name, first_name, blood_type
+       ORDER BY last_name;
+-----------------------
+SELECT * FROM grpd_qty;
+
+=dnr_status====================================================================================
+VIEW: check if the donor donation status, by checking their last donation date in DONORS TABLE 
+      (minimum of 56 days between whole blood donations)
+
+COLUMN "Last Donation" FORMAT A13
+COLUMN "Next Donation" FORMAT A13
+
+CREATE VIEW dnr_status
+AS     SELECT donor_id         "Donor ID",
+              last_name        "Donor",
+              last_donation    "Last Donation",
+              last_donation+56 "Next Donation",
+       CASE   WHEN last_donation+56 <= SYSDATE THEN 'eligible to donate'
+              ELSE 'not eligible' 
+       END "Current Status"
+       FROM donor;
+-------------------------
+SELECT * FROM dnr_status;
+
+=dnr_emp=========================================================================
+VIEW: JOIN donor and employee who assist them.
+
+COLUMN "Employee ID" FORMAT A11
+
+CREATE VIEW dnr_emp
+AS     SELECT d.donor_id    "Donor ID",
+              d.last_name || ', ' || d.first_name "Donor",
+              e.employee_id "Employee ID",
+              e.last_name || ', ' || e.first_name "Assisted by"
+       FROM   donor d JOIN employee e
+       ON     d.employee_id = e.employee_id
+       ORDER BY d.donor_id, e.employee_id;
+-------------------------
+SELECT * FROM dnr_emp;
+
+=shelf_life=======================================================
+VIEW: shows the shelf life of the donated blood.
+
+COLUMN "Inventory ID" FORMAT A12
+COLUMN "Blood Type" FORMAT A10
+COLUMN "Date Donated" FORMAT A12
+COLUMN "Expiration Date" FORMAT A16
+COLUMN "Current Status" FORMAT A14
+
+CREATE VIEW shelf_life
+AS     SELECT inventory_id       "Inventory ID",
+              i.blood_type       "Blood Type",
+              i.blood_quantity   "Quantity",
+              l.donation_date    "Date Donated",
+              l.donation_date+35 "Expiration Date",
+       CASE   WHEN l.donation_date+35 >= SYSDATE THEN 'available'
+              ELSE 'expired' 
+       END "Current Status"
+       FROM inventory i JOIN donation_log l
+       USING(inventory_id);
+-------------------------
+SELECT * FROM shelf_life;
+
+
+=stock=======================================================
+CREATE VIEW stock
+AS     SELECT blood_type "Blood Type",
+              SUM(blood_quantity) "Stock"
+       FROM   inventory
+       GROUP BY blood_type
+       ORDER BY blood_type; 
+----------------------------
+SELECT * FROM stock;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+              

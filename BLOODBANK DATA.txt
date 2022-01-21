@@ -1,0 +1,315 @@
+CREATE TABLE employee(
+       employee_id    VARCHAR2(8)   NOT NULL,
+       first_name     VARCHAR2(20)  NOT NULL,
+       last_name      VARCHAR2(20)  NOT NULL,
+       address        VARCHAR2(25)  NOT NULL,
+       contact_no     VARCHAR2(12)  NOT NULL,
+       CONSTRAINT employee_id_pk PRIMARY KEY (employee_id));
+
+CREATE TABLE donor(
+       donor_id       VARCHAR2(8)   NOT NULL
+          CONSTRAINT   donor_id_pk    PRIMARY KEY,
+       first_name     VARCHAR2(20)  NOT NULL,
+       last_name      VARCHAR2(20)  NOT NULL,
+       gender         CHAR(1)      NOT NULL
+          CONSTRAINT   check_gender   CHECK (gender IN ('M', 'F')),  
+       age            NUMBER(2)    NOT NULL,
+       weight_kg      NUMBER(3)    NOT NULL,
+       height_cm      NUMBER(3)    NOT NULL,
+       last_donation  DATE         NOT NULL,
+       contact_no     VARCHAR2(12)  NOT NULL,
+       email          VARCHAR2(25)  NOT NULL
+          CONSTRAINT   email_uk       UNIQUE,
+       address        VARCHAR2(25)  NOT NULL,
+       employee_id    VARCHAR2(8)   NOT NULL
+          CONSTRAINT   employee_id_fk REFERENCES
+             employee (employee_id));    
+  
+CREATE TABLE hospital(
+       hospital_id    VARCHAR2(8)   NOT NULL
+          CONSTRAINT   hospital_id_pk PRIMARY KEY,
+       hospital_name  VARCHAR2(20)  NOT NULL,
+       address        VARCHAR2(30)  NOT NULL,
+       contact_no     VARCHAR2(15)  NOT NULL,
+       contact_person VARCHAR2(20)  NOT NULL );
+
+CREATE TABLE request(
+       request_id         VARCHAR2(8)   NOT NULL
+          CONSTRAINT       request_id_pk  PRIMARY KEY,
+       request_date       DATE         NOT NULL,
+       quantity_requested NUMBER(5)    NOT NULL,
+       type_requested     VARCHAR2(5)   NOT NULL
+          CONSTRAINT       check_type     
+           CHECK (type_requested IN ('A+', 'O+', 'B+', 'AB+', 'A-', 'O-', 'B-', 'AB-')),
+       hospital_id        VARCHAR2(8)   NOT NULL
+          CONSTRAINT   hospital_id_fk     REFERENCES
+             hospital (hospital_id)); 
+
+CREATE TABLE inventory(
+       inventory_id   VARCHAR2(8)      NOT NULL
+          CONSTRAINT   inventory_id_pk  PRIMARY KEY,
+       blood_type     VARCHAR2(5)      NOT NULL
+          CONSTRAINT   check_blood_type 
+            CHECK (blood_type IN ('A+', 'O+', 'B+', 'AB+', 'A-', 'O-', 'B-', 'AB-')),
+       blood_quantity NUMBER(5)        NOT NULL,
+       request_id     VARCHAR2(8)      
+          CONSTRAINT   request_id_fk    REFERENCES
+             request  (request_id)); 
+
+CREATE TABLE donation_log(
+       donation_id    VARCHAR2(8)      NOT NULL
+          CONSTRAINT   donation_id_pk  PRIMARY KEY,
+       donor_id       VARCHAR2(8)      NOT NULL
+          CONSTRAINT   donor_id_fk     REFERENCES
+               donor  (donor_id),
+       donation_date  DATE             NOT NULL,
+       blood_type     VARCHAR2(5)      NOT NULL
+          CONSTRAINT   check_dblood_type 
+           CHECK (blood_type IN ('A+', 'O+', 'B+', 'AB+', 'A-', 'O-', 'B-', 'AB-')),
+       blood_quantity NUMBER(5)        NOT NULL,
+       inventory_id   VARCHAR2(8)      
+          CONSTRAINT   inventory_id_fk     REFERENCES
+           inventory  (inventory_id));
+
+
+INSERT ALL
+  INTO employee (employee_id,first_name,last_name,address,contact_no) 
+         VALUES ('e100','Amaya','Villarosa','Manila','542-068-510')
+  INTO employee (employee_id,first_name,last_name,address,contact_no) 
+         VALUES ('e101','Kevin','Cabrera','San Vicente','032-701-711')
+  INTO employee (employee_id,first_name,last_name,address,contact_no) 
+         VALUES ('e102','Joshua','Rodriquez','Davao City','325-438-241')
+  INTO employee (employee_id,first_name,last_name,address,contact_no) 
+         VALUES ('e103','Melyssa','Schroeder','Cavite City','954-954-687')
+  INTO employee (employee_id,first_name,last_name,address,contact_no) 
+         VALUES ('e104','Stephen','Avila','Cebu City','384-901-663')
+  INTO employee (employee_id,first_name,last_name,address,contact_no) 
+         VALUES ('e105','Katelyn','Ullrich','Caloocan City','633-534-054')
+  INTO employee (employee_id,first_name,last_name,address,contact_no) 
+         VALUES ('e106','Sara','Tillman','Quezon City','646-360-758')
+  INTO employee (employee_id,first_name,last_name,address,contact_no) 
+         VALUES ('e107','Ginger','Mitchell','Manila','725-720-312')
+  INTO employee (employee_id,first_name,last_name,address,contact_no) 
+         VALUES ('e108','Lamar','Gibson','Quezon City','443-896-705')
+  INTO employee (employee_id,first_name,last_name,address,contact_no) 
+         VALUES ('e109','Sylvia','Prohaska','Caloocan City','393-581-531')
+  INTO employee (employee_id,first_name,last_name,address,contact_no) 
+         VALUES ('e110','Reece','Grant','Cavite City','033-119-585')
+SELECT * FROM dual;
+
+SELECT * FROM employee;
+
+INSERT ALL
+  INTO donor (donor_id,first_name,last_name,gender,age,weight_kg,height_cm,last_donation,contact_no,email,address,employee_id) 
+      VALUES ('d100','Autumn','Kohler','F',25,57,167,TO_DATE('2021-05-18','YYYY-MM-DD'),'012-333-981','bwolf@yahoo.com','Muntinlupa City','e103')
+  INTO donor (donor_id,first_name,last_name,gender,age,weight_kg,height_cm,last_donation,contact_no,email,address,employee_id) 
+      VALUES ('d101','Kirsten','Corwin','F',29,60,159,TO_DATE('2021-05-16','YYYY-MM-DD'),'610-938-152','west.zaria@yahoo.com','Cebu City','e109')
+  INTO donor (donor_id,first_name,last_name,gender,age,weight_kg,height_cm,last_donation,contact_no,email,address,employee_id) 
+      VALUES ('d102','Richie','McDermott','M',30,65,163,TO_DATE('2021-05-16','YYYY-MM-DD'),'528-419-057','krystal38@yahoo.com','Caloocan City','e109')
+  INTO donor (donor_id,first_name,last_name,gender,age,weight_kg,height_cm,last_donation,contact_no,email,address,employee_id) 
+      VALUES ('d103','Marta','Roob','F',33,55,168,TO_DATE('2021-05-17','YYYY-MM-DD'),'592-757-632','ogislason@yahoo.com','Davao City','e107')
+  INTO donor (donor_id,first_name,last_name,gender,age,weight_kg,height_cm,last_donation,contact_no,email,address,employee_id) 
+      VALUES ('d104','Carmine','Graham','F',26,59,164,TO_DATE('2021-05-17','YYYY-MM-DD'),'661-488-574','ophelia41@yahoo.com','Pasay City','e104')
+  INTO donor (donor_id,first_name,last_name,gender,age,weight_kg,height_cm,last_donation,contact_no,email,address,employee_id) 
+      VALUES ('d105','Sigmund','Anderson','M',35,68,158,TO_DATE('2021-05-18','YYYY-MM-DD'),'676-638-132','boyle@yahoo.com','Pasig City','e101')
+  INTO donor (donor_id,first_name,last_name,gender,age,weight_kg,height_cm,last_donation,contact_no,email,address,employee_id) 
+      VALUES ('d106','Larissa','Flatley','F',40,70,176,TO_DATE('2021-05-17','YYYY-MM-DD'),'333-153-500','alexandre@yahoo.com','Lucena City','e101')
+  INTO donor (donor_id,first_name,last_name,gender,age,weight_kg,height_cm,last_donation,contact_no,email,address,employee_id) 
+      VALUES ('d107','Elijah','Wolff','M',23,72,171,TO_DATE('2021-05-18','YYYY-MM-DD'),'325-13-6476','orn@yahoo.com','San Isidro','e103')
+  
+  INTO donor (donor_id,first_name,last_name,gender,age,weight_kg,height_cm,last_donation,contact_no,email,address,employee_id) 
+      VALUES ('d108','Saul','Walker','M',26,52,162,TO_DATE('2021-05-18','YYYY-MM-DD'),'336-536-364','smraz@yahoo.com','Quezon City','e106')
+  INTO donor (donor_id,first_name,last_name,gender,age,weight_kg,height_cm,last_donation,contact_no,email,address,employee_id) 
+      VALUES ('d109','Harley','Treutel','M',30,55,159,TO_DATE('2021-05-18','YYYY-MM-DD'),'253-789-355','bartell@yahoo.com','Quezon City','e102')
+  INTO donor (donor_id,first_name,last_name,gender,age,weight_kg,height_cm,last_donation,contact_no,email,address,employee_id) 
+      VALUES ('d110','Sarina','Purdy','F',36,67,176,TO_DATE('2021-05-16','YYYY-MM-DD'),'211-531-249','aratke@yahoo.com','Quezon City','e108')
+  INTO donor (donor_id,first_name,last_name,gender,age,weight_kg,height_cm,last_donation,contact_no,email,address,employee_id) 
+      VALUES ('d111','Nikko','Kiehn','M',32,60,171,TO_DATE('2021-05-16','YYYY-MM-DD'),'512-189-601','reed@yahoo.com','Cavite','e110')
+  INTO donor (donor_id,first_name,last_name,gender,age,weight_kg,height_cm,last_donation,contact_no,email,address,employee_id) 
+      VALUES ('d112','Tiffany','Medhurst','F',29,57,168,TO_DATE('2021-05-17','YYYY-MM-DD'),'517-971-470','emard@yahoo.com','Pasay City','e108')
+  INTO donor (donor_id,first_name,last_name,gender,age,weight_kg,height_cm,last_donation,contact_no,email,address,employee_id) 
+      VALUES ('d113','Fletcher','Douglas','M',40,59,155,TO_DATE('2021-05-17','YYYY-MM-DD'),'347-127-884','nedra@yahoo.com','Taguig City','e106')
+  INTO donor (donor_id,first_name,last_name,gender,age,weight_kg,height_cm,last_donation,contact_no,email,address,employee_id) 
+      VALUES ('d114','Lonzo','Sanford','M',27,54,160,TO_DATE('2021-05-16','YYYY-MM-DD'),'326-708-281','stone.terry@yahoo.com','Taguig City','e110')
+  INTO donor (donor_id,first_name,last_name,gender,age,weight_kg,height_cm,last_donation,contact_no,email,address,employee_id) 
+      VALUES ('d115','Miguel','McClure','M',34,59,159,TO_DATE('2021-05-16','YYYY-MM-DD'),'751-910-183','bwalsh@yahoo.com','Mandaluyong City','e105')
+SELECT * FROM dual;
+
+SELECT * FROM donor;
+
+INSERT ALL
+  INTO hospital (hospital_id,hospital_name,address,contact_no,contact_person) 
+         VALUES ('h100','San Lazaro Hospital','Quiricada St,  Manila','(02) 8732 3777','Pedro Doyle')
+  INTO hospital (hospital_id,hospital_name,address,contact_no,contact_person) 
+         VALUES ('h101','Perpetual Hospital','Loang Laan, Manila','(02) 8731 1550','Watson Klein')
+  INTO hospital (hospital_id,hospital_name,address,contact_no,contact_person) 
+         VALUES ('h102','Ospital ng Sampaloc','Geronimo St, Sampaloc, Manila','(02) 8749 0224','Rozella Simonis')
+  INTO hospital (hospital_id,hospital_name,address,contact_no,contact_person) 
+         VALUES ('h103','ManilaMed','850 United Nations Ave, Manila','(02) 8523 8131','Dulce Hammes')
+  INTO hospital (hospital_id,hospital_name,address,contact_no,contact_person) 
+         VALUES ('h104','San Lazaro Hospital','Santa Cruz, Manila','(02) 8732 3777','Allene Ward')
+  INTO hospital (hospital_id,hospital_name,address,contact_no,contact_person) 
+         VALUES ('h105','Sta Ana Hospital','Santa Ana, Manila','(02) 8516 6151','Jadyn Casper')
+SELECT * FROM dual;
+
+SELECT * FROM hospital;
+
+INSERT ALL
+  INTO request (request_id,request_date,quantity_requested,type_requested,hospital_id) 
+        VALUES ('rq100',TO_DATE('2021-06-01','YYYY-MM-DD'),2,'B+','h103')
+  INTO request (request_id,request_date,quantity_requested,type_requested,hospital_id) 
+        VALUES ('rq101',TO_DATE('2021-05-24','YYYY-MM-DD'),2,'O+','h101')
+  INTO request (request_id,request_date,quantity_requested,type_requested,hospital_id) 
+        VALUES ('rq102',TO_DATE('2021-06-02','YYYY-MM-DD'),2,'AB+','h104')
+  INTO request (request_id,request_date,quantity_requested,type_requested,hospital_id) 
+        VALUES ('rq103',TO_DATE('2021-05-20','YYYY-MM-DD'),2,'AB-','h102')
+  INTO request (request_id,request_date,quantity_requested,type_requested,hospital_id) 
+        VALUES ('rq104',TO_DATE('2021-05-27','YYYY-MM-DD'),1,'B-','h105')
+  INTO request (request_id,request_date,quantity_requested,type_requested,hospital_id) 
+        VALUES ('rq105',TO_DATE('2021-01-09','YYYY-MM-DD'),10,'A-','h105')
+  INTO request (request_id,request_date,quantity_requested,type_requested,hospital_id) 
+        VALUES ('rq106',TO_DATE('2021-01-08','YYYY-MM-DD'),10,'AB+','h103')
+  INTO request (request_id,request_date,quantity_requested,type_requested,hospital_id) 
+        VALUES ('rq107',TO_DATE('2020-12-05','YYYY-MM-DD'),15,'O+','h101')
+  INTO request (request_id,request_date,quantity_requested,type_requested,hospital_id) 
+        VALUES ('rq108',TO_DATE('2020-11-03','YYYY-MM-DD'),5,'AB-','h104')
+  INTO request (request_id,request_date,quantity_requested,type_requested,hospital_id) 
+        VALUES ('rq109',TO_DATE('2020-11-09','YYYY-MM-DD'),5,'O+','h100')
+  INTO request (request_id,request_date,quantity_requested,type_requested,hospital_id) 
+        VALUES ('rq110',TO_DATE('2020-12-14','YYYY-MM-DD'),10,'A+','h102')
+SELECT * FROM dual;
+
+SELECT * FROM request;
+
+INSERT ALL
+  INTO inventory (inventory_id,blood_type,blood_quantity,request_id) 
+          VALUES ('i100','AB+',1,'rq102')
+  INTO inventory (inventory_id,blood_type,blood_quantity,request_id) 
+          VALUES ('i101','B+',1,'rq100')
+  INTO inventory (inventory_id,blood_type,blood_quantity,request_id) 
+          VALUES ('i102','O+',1,NULL)
+  INTO inventory (inventory_id,blood_type,blood_quantity,request_id) 
+          VALUES ('i103','B+',1,'rq100')
+  INTO inventory (inventory_id,blood_type,blood_quantity,request_id) 
+          VALUES ('i104','AB-',1,'rq103')
+  INTO inventory (inventory_id,blood_type,blood_quantity,request_id) 
+          VALUES ('i105','A+',1,NULL)
+  INTO inventory (inventory_id,blood_type,blood_quantity,request_id) 
+          VALUES ('i106','A+',1,NULL)
+  INTO inventory (inventory_id,blood_type,blood_quantity,request_id) 
+          VALUES ('i107','O+',1,NULL)
+  INTO inventory (inventory_id,blood_type,blood_quantity,request_id) 
+          VALUES ('i108','B+',1,NULL)
+  INTO inventory (inventory_id,blood_type,blood_quantity,request_id) 
+          VALUES ('i109','AB+',1,'rq102')
+  INTO inventory (inventory_id,blood_type,blood_quantity,request_id) 
+          VALUES ('i110','A-',1,NULL)
+  INTO inventory (inventory_id,blood_type,blood_quantity,request_id) 
+          VALUES ('i111','O-',1,NULL)
+  INTO inventory (inventory_id,blood_type,blood_quantity,request_id) 
+          VALUES ('i112','B-',1,'rq104')
+  INTO inventory (inventory_id,blood_type,blood_quantity,request_id) 
+          VALUES ('i113','AB-',1,'rq103')
+  INTO inventory (inventory_id,blood_type,blood_quantity,request_id) 
+          VALUES ('i114','O+',1,'rq101')
+  INTO inventory (inventory_id,blood_type,blood_quantity,request_id) 
+          VALUES ('i115','O+',1,'rq101')
+SELECT * FROM dual;
+
+SELECT * FROM inventory;
+
+
+INSERT ALL
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd100','d100',TO_DATE('2021-05-18','YYYY-MM-DD'),'AB+',1,'i100')
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd101','d101',TO_DATE('2021-05-16','YYYY-MM-DD'),'B+',1,'i101')
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd102','d102',TO_DATE('2021-05-16','YYYY-MM-DD'),'O+',1,'i102')
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd103','d103',TO_DATE('2021-05-17','YYYY-MM-DD'),'B+',1,'i103')
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd104','d104',TO_DATE('2021-05-17','YYYY-MM-DD'),'AB-',1,'i104')
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd105','d105',TO_DATE('2021-05-18','YYYY-MM-DD'),'A+',1,'i105')
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd106','d106',TO_DATE('2021-05-17','YYYY-MM-DD'),'A+',1,'i106')
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd107','d107',TO_DATE('2021-05-18','YYYY-MM-DD'),'O+',1,'i107')
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd108','d108',TO_DATE('2021-05-18','YYYY-MM-DD'),'B+',1,'i108')
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd109','d109',TO_DATE('2021-05-18','YYYY-MM-DD'),'AB+',1,'i109')
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd110','d110',TO_DATE('2021-05-16','YYYY-MM-DD'),'A-',1,'i110')
+  
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd111','d111',TO_DATE('2021-05-16','YYYY-MM-DD'),'O-',1,'i111')
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd112','d112',TO_DATE('2021-05-17','YYYY-MM-DD'),'B-',1,'i112')
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd113','d113',TO_DATE('2021-05-17','YYYY-MM-DD'),'AB-',1,'i113')
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd114','d114',TO_DATE('2021-05-16','YYYY-MM-DD'),'O+',1,'i114')
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd115','d115',TO_DATE('2021-05-16','YYYY-MM-DD'),'O+',1,'i115')
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd116','d101',TO_DATE('2020-12-04','YYYY-MM-DD'),'B+',1,NULL)
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd117','d111',TO_DATE('2020-12-04','YYYY-MM-DD'),'O-',1,NULL)
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd118','d104',TO_DATE('2020-07-10','YYYY-MM-DD'),'AB-',1,NULL)
+  INTO donation_log (donation_id,donor_id,donation_date,blood_type,blood_quantity,inventory_id) 
+             VALUES ('dd119','d104',TO_DATE('2020-03-23','YYYY-MM-DD'),'AB-',1,NULL)
+SELECT * FROM dual;
+
+SELECT * FROM donation_log;
+
+
+
+--------------------------------------------------------------------------------
+SYNTAX:
+INSERT ALL
+  INTO table_name (column1, column2, column_n) VALUES (expr1, expr2, expr_n)
+SELECT * FROM dual;
+
+
+UPDATE donation_log
+SET donation_date = TO_DATE('2020-03-23','YYYY-MM-DD')
+WHERE donation_id = 'dd119';
+
+SELECT * FROM employee;
+COLUMN employee_id FORMAT A11
+COLUMN last_name FORMAT A10
+COLUMN first_name FORMAT A10
+
+SELECT * FROM donor;
+COLUMN gender FORMAT A7
+COLUMN email FORMAT A21
+COLUMN address FORMAT A16
+COLUMN last_donation FORMAT A13
+
+SELECT * FROM hospital;
+COLUMN hospital_id FORMAT A11
+COLUMN address FORMAT A30
+
+SELECT * FROM request;
+COLUMN request_id FORMAT A10
+COLUMN request_date FORMAT A12
+COLUMN type_requested FORMAT A14
+
+SELECT * FROM inventory;
+COLUMN inventory_id FORMAT A12
+COLUMN blood_type FORMAT A10
+
+
+SELECT * FROM donation_log;
+COLUMN donation_id FORMAT A11
+COLUMN donation_date FORMAT A13
+
+SELECT * FROM employee;
+SELECT * FROM donor;
+SELECT * FROM hospital;
+SELECT * FROM request;
+SELECT * FROM inventory;
+SELECT * FROM donation_log;
